@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chiclana de Ocio y de Negocio</title>
+<style>
+:root{--bg:#fbf8f2;--card:#fff;--ink:#1d2b36;--mut:#66727c;--acc:#0b7a8a;--acc2:#e07a1f;--bd:#e4ddd0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a21;--card:#17252f;--ink:#e9eef1;--mut:#9aa8b2;--acc:#3cc0d2;--acc2:#f0a255;--bd:#27394546}}
+:root[data-theme="dark"]{--bg:#101a21;--card:#17252f;--ink:#e9eef1;--mut:#9aa8b2;--acc:#3cc0d2;--acc2:#f0a255;--bd:#2a3c48}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:2rem 1rem 1.2rem;text-align:center;background:linear-gradient(135deg,var(--acc),#0a4f66);color:#fff}
+header h1{margin:0;font:700 clamp(1.6rem,5vw,2.6rem) Georgia,serif}header p{margin:.4rem auto 0;max-width:640px;opacity:.92}
+main{max-width:1050px;margin:0 auto;padding:1rem}
+.bar{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:.55rem .7rem;min-width:0}
+#q{flex:1 1 240px}
+.chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.5rem 0 1rem}
+.chip{border:1px solid var(--bd);background:var(--card);color:var(--ink);border-radius:99px;padding:.3rem .8rem;cursor:pointer;font:inherit;font-size:.9rem}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:.9rem;display:flex;flex-direction:column;gap:.3rem}
+.card h3{margin:0;font-size:1.05rem}.tag{font-size:.75rem;font-weight:600;border-radius:6px;padding:.1rem .45rem;align-self:flex-start;color:#fff}
+.ocio{background:var(--acc)}.negocio{background:var(--acc2)}
+.card p{margin:0;color:var(--mut);font-size:.92rem}.card a{color:var(--acc);font-weight:600;text-decoration:none;font-size:.9rem}
+.card .acts{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:auto;padding-top:.4rem}
+button.lnk{background:none;border:0;color:#c0392b;cursor:pointer;font:inherit;font-size:.85rem;padding:0}
+h2{font:700 1.4rem Georgia,serif;margin:1.8rem 0 .4rem}
+details{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:.8rem 1rem;margin-top:1.5rem}summary{cursor:pointer;font-weight:700}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.5rem;margin-top:.8rem}form .w{grid-column:1/-1}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:.6rem 1rem;cursor:pointer;font:inherit;font-weight:600}
+.btn.s{background:var(--card);color:var(--ink);border:1px solid var(--bd)}
+footer{text-align:center;color:var(--mut);font-size:.85rem;padding:2rem 1rem}
+#elige{max-width:1050px;margin:0 auto;padding:1rem}#elige h2{margin:.2rem 0 .7rem;text-align:center}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.op{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:1.1rem .6rem;border-radius:16px;border:3px solid var(--bd);background:var(--card);color:var(--ink);cursor:pointer;font:inherit;text-align:center}
+.op span{font-size:2.2rem}.op b{font-size:1.4rem}.op small{color:var(--mut)}
+.op[data-m=ocio].on{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc) inset}.op[data-m=negocio].on{border-color:var(--acc2);box-shadow:0 0 0 3px var(--acc2) inset}
+@media(max-width:520px){.dos{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Chiclana de Ocio y de Negocio</h1><p>Directorio autónomo de Chiclana de la Frontera (11130, Cádiz): playas, patrimonio, naturaleza y comercios. Añade tus propios sitios y negocios.</p></header>
+<section id="elige"><h2>¿Qué buscas hoy?</h2><div class="dos">
+<button class="op" data-m="ocio"><span>🏖️</span><b>Ocio</b><small>Playas, patrimonio, naturaleza, cultura, deporte, bares</small></button>
+<button class="op" data-m="negocio"><span>🏪</span><b>Negocio</b><small>Comercios, servicios, alojamiento, empresas, administración</small></button></div>
+<p id="hint" style="text-align:center;color:var(--mut)">Elige una de las dos opciones para ver el directorio.</p></section>
+<main id="main" hidden>
+<div class="bar"><input id="q" type="search" placeholder="Buscar por nombre, categoría, dirección…" aria-label="Buscar">
+</div>
+<div class="chips" id="chips"></div>
+<div class="grid" id="grid"></div>
+<p id="empty" hidden style="color:var(--mut)">Sin resultados. Prueba otra búsqueda o añade el sitio abajo.</p>
+
+<h2 id="mt"></h2>
+<p style="color:var(--mut);margin-top:0">Ningún directorio fijo puede abarcar todos los comercios: estas búsquedas abren Google Maps con datos siempre actualizados.</p>
+<div class="chips" id="maps"></div>
+
+<details><summary>＋ Añadir un sitio o negocio</summary>
+<form id="f">
+<input name="n" placeholder="Nombre *" required><select name="t"><option value="negocio">Negocio</option><option value="ocio">Ocio</option></select>
+<input name="c" placeholder="Categoría (ej. Restaurante) *" required><input name="a" placeholder="Dirección">
+<input name="p" placeholder="Teléfono"><input name="w" type="url" placeholder="Web (https://…)">
+<textarea class="w" name="d" rows="2" placeholder="Descripción"></textarea>
+<div class="w"><button class="btn" type="submit">Guardar</button> <button class="btn s" type="button" id="exp">Exportar JSON</button> <button class="btn s" type="button" id="imp">Importar JSON</button></div>
+</form>
+<p style="color:var(--mut);font-size:.85rem">Tus altas se guardan en este navegador. Exporta el JSON para conservarlas o pasarlas a otro dispositivo.</p></details>
+</main>
+<footer><div id="fecha"></div>Datos orientativos: comprueba horarios y teléfonos antes de ir. Sitio independiente, sin vinculación oficial con el Ayuntamiento.</footer>
+<script>
+let SEED=[],LIM=120;
+const CATS=["Restaurantes","Bares y tapas","Hoteles","Apartamentos turísticos","Supermercados","Farmacias","Talleres mecánicos","Peluquerías","Inmobiliarias","Gestorías","Abogados","Clínicas","Gimnasios","Ferreterías","Panaderías","Bodegas y vinos","Tiendas de ropa","Colegios","Clubes náuticos","Alquiler de coches"];
+let mine=[];try{mine=JSON.parse(localStorage.getItem("chic")||"[]")}catch(e){}
+const save=()=>{try{localStorage.setItem("chic",JSON.stringify(mine))}catch(e){}};
+const $=s=>document.querySelector(s),el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const map=s=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s+" Chiclana de la Frontera 11130");
+let cat="",modo="";
+function render(){
+ const all=[...SEED,...mine],q=$("#q").value.toLowerCase(),t=modo;
+ const cs=[...new Set(all.filter(x=>x.t===modo).map(x=>x.c))].sort();const ch=$("#chips");ch.textContent="";
+ [["", "Todas"],...cs.map(c=>[c,c])].forEach(([v,l])=>{const b=el("button","chip"+(cat===v?" on":""),l);b.onclick=()=>{cat=v;render()};ch.append(b)});
+ const g=$("#grid");g.textContent="";let n=0;
+ all.forEach((x,i)=>{
+  if(t&&x.t!==t||cat&&x.c!==cat)return;
+  if(q&&![x.n,x.c,x.a,x.d].join(" ").toLowerCase().includes(q))return;
+  n++;if(n>LIM)return;const c=el("div","card");c.append(el("span","tag "+x.t,x.t==="ocio"?"Ocio · "+x.c:"Negocio · "+x.c),el("h3","",x.n));
+  if(x.a)c.append(el("p","","📍 "+x.a));if(x.p)c.append(el("p","","📞 "+x.p));if(x.h)c.append(el("p","","🕒 "+x.h));if(x.d)c.append(el("p","",x.d));
+  const a=el("div","acts"),m=el("a","","Ver en mapa");m.href=x.lat?"https://www.google.com/maps/search/?api=1&query="+x.lat+","+x.lon:map(x.n);m.target="_blank";m.rel="noopener";a.append(m);
+  if(x.w&&/^https?:\/\//.test(x.w)){const w=el("a","","Web");w.href=x.w;w.target="_blank";w.rel="noopener";a.append(w)}
+  if(!x.seed){const d=el("button","lnk","Eliminar");d.onclick=()=>{mine.splice(i-SEED.length,1);save();render()};a.append(d)}
+  c.append(a);g.append(c)});
+ if(n>LIM){const b=el("button","btn s","Mostrar más ("+(n-LIM)+" restantes)");b.style.gridColumn="1/-1";b.onclick=()=>{LIM+=120;render()};g.append(b)}
+ $("#empty").hidden=n>0}
+$("#q").oninput=()=>{LIM=120;render()};
+const MN=CATS,MO=["Playas","Chiringuitos","Museos","Parques","Rutas de senderismo","Campos de golf","Cines","Discotecas","Clubes náuticos","Parques infantiles"];
+function mapas(){const m=$("#maps");m.textContent="";$("#mt").textContent=modo==="ocio"?"Más ocio, en el mapa":"Todos los negocios, en el mapa";(modo==="ocio"?MO:MN).forEach(c=>{const a=el("a","chip",c);a.href=map(c);a.target="_blank";a.rel="noopener";a.style.textDecoration="none";m.append(a)})}
+function elegir(m){modo=m;cat="";q_.value="";if(typeof LIM!=="undefined")LIM=120;document.querySelectorAll(".op").forEach(b=>b.classList.toggle("on",b.dataset.m===m));$("#main").hidden=false;$("#hint").hidden=true;document.querySelector("[name=t]").value=m;mapas();render();$("#main").scrollIntoView({behavior:"smooth"})}
+const q_=$("#q");document.querySelectorAll(".op").forEach(b=>b.onclick=()=>elegir(b.dataset.m));
+$("#f").onsubmit=e=>{e.preventDefault();const d=new FormData(e.target);mine.push({n:d.get("n"),t:d.get("t"),c:d.get("c"),a:d.get("a"),p:d.get("p"),w:d.get("w"),d:d.get("d")});save();e.target.reset();render()};
+$("#exp").onclick=()=>{const s=JSON.stringify(mine,null,1);navigator.clipboard?.writeText(s).then(()=>alert("JSON copiado al portapapeles"),()=>prompt("Copia el JSON:",s))||prompt("Copia el JSON:",s)};
+$("#imp").onclick=()=>{const s=prompt("Pega aquí el JSON exportado:");if(!s)return;try{const a=JSON.parse(s);if(Array.isArray(a)){mine=mine.concat(a.filter(x=>x&&x.n&&x.c&&(x.t==="ocio"||x.t==="negocio")).map(x=>({n:String(x.n),t:x.t,c:String(x.c),a:x.a?String(x.a):"",p:x.p?String(x.p):"",w:x.w?String(x.w):"",d:x.d?String(x.d):""})));save();render()}}catch(e){alert("JSON no válido")}};
+fetch("data.json").then(r=>r.json()).then(j=>{SEED=j.items.map(x=>({...x,seed:1}));$("#fecha").textContent="Última actualización automática: "+j.actualizado+" · "+j.items.length+" fichas";render()}).catch(()=>render());
+</script></body></html>

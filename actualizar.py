@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+"""Descarga de OpenStreetMap los comercios y lugares de Chiclana y crea data.json."""
+import json, sys, time, datetime, pathlib, urllib.parse, urllib.request
+
+RAIZ = pathlib.Path(__file__).parent
+SERVIDORES = ["https://overpass-api.de/api/interpreter",
+              "https://overpass.kumi.systems/api/interpreter"]
+CONSULTA = """[out:json][timeout:180];
+area["boundary"="administrative"]["name"="Chiclana de la Frontera"]->.z;
+(
+ nwr["shop"](area.z);
+ nwr["amenity"~"^(restaurant|bar|cafe|pub|fast_food|ice_cream|pharmacy|clinic|dentist|doctors|veterinary|bank|cinema|theatre|nightclub|marketplace|fuel|car_wash|car_rental|driving_school|school|kindergarten|post_office|townhall|library)$"](area.z);
+ nwr["tourism"~"^(hotel|hostel|guest_house|apartment|camp_site|museum|attraction|gallery|viewpoint|zoo|theme_park)$"](area.z);
+ nwr["leisure"~"^(sports_centre|fitness_centre|golf_course|marina|park|water_park|swimming_pool|dance|miniature_golf|stadium|nature_reserve|beach_resort)$"](area.z);
+ nwr["craft"](area.z);
+ nwr["office"](area.z);
+ nwr["historic"~"^(castle|monument|church|ruins|memorial|archaeological_site)$"](area.z);
+ nwr["natural"="beach"](area.z);
+);
+out center tags;"""
+
+SHOP = {"supermarket":"Supermercado","convenience":"Tienda de barrio","bakery":"Panadería","butcher":"Carnicería",
+ "clothes":"Ropa","shoes":"Calzado","hairdresser":"Peluquería","beauty":"Estética","car_repair":"Taller mecánico",
+ "hardware":"Ferretería","florist":"Floristería","optician":"Óptica","jewelry":"Joyería","mobile_phone":"Telefonía",
+ "electronics":"Electrónica","furniture":"Muebles","books":"Librería","bicycle":"Bicicletas","sports":"Deportes",
+ "pet":"Mascotas","greengrocer":"Frutería","seafood":"Pescadería","alcohol":"Bodega y licores","wine":"Vinos",
+ "kiosk":"Quiosco","tobacco":"Estanco","estate_agent":"Inmobiliaria","laundry":"Lavandería","chemist":"Droguería",
+ "gift":"Regalos","toys":"Juguetes","car":"Concesionario","car_parts":"Recambios","tyres":"Neumáticos",
+ "deli":"Delicatessen","variety_store":"Bazar","stationery":"Papelería","travel_agency":"Agencia de viajes",
+ "bag":"Bolsos","fabric":"Telas","bed":"Colchones","interior_decoration":"Decoración","garden_centre":"Jardinería"}
+AMEN = {"restaurant":("Restaurante","negocio"),"bar":("Bar","ocio"),"pub":("Bar","ocio"),"cafe":("Cafetería","negocio"),
+ "fast_food":("Comida rápida","negocio"),"ice_cream":("Heladería","negocio"),"pharmacy":("Farmacia","negocio"),
+ "clinic":("Clínica","negocio"),"dentist":("Dentista","negocio"),"doctors":("Consulta médica","negocio"),
+ "veterinary":("Veterinario","negocio"),"bank":("Banco","negocio"),"cinema":("Cine","ocio"),"theatre":("Teatro","ocio"),
+ "nightclub":("Discoteca","ocio"),"marketplace":("Mercado","negocio"),"fuel":("Gasolinera","negocio"),
+ "car_wash":("Lavado de coches","negocio"),"car_rental":("Alquiler de coches","negocio"),
+ "driving_school":("Autoescuela","negocio"),"school":("Colegio","negocio"),"kindergarten":("Guardería","negocio"),
+ "post_office":("Correos","negocio"),"townhall":("Administración","negocio"),"library":("Biblioteca","ocio")}
+TUR = {"hotel":("Hotel","negocio"),"hostel":("Hostal","negocio"),"guest_house":("Alojamiento","negocio"),
+ "apartment":("Apartamentos","negocio"),"camp_site":("Camping","negocio"),"museum":("Museo","ocio"),
+ "attraction":("Atracción","ocio"),"gallery":("Galería de arte","ocio"),"viewpoint":("Mirador","ocio"),
+ "zoo":("Zoo","ocio"),"theme_park":("Parque temático","ocio")}
+LEI = {"sports_centre":"Deporte","fitness_centre":"Gimnasio","golf_course":"Golf","marina":"Puerto deportivo",
+ "park":"Parque","water_park":"Parque acuático","swimming_pool":"Piscina","dance":"Baile","miniature_golf":"Minigolf",
+ "stadium":"Estadio","nature_reserve":"Naturaleza","beach_resort":"Playa"}
+OFI = {"estate_agent":"Inmobiliaria","lawyer":"Abogado","accountant":"Gestoría","tax_advisor":"Asesoría fiscal",
+ "insurance":"Seguros","architect":"Arquitecto","financial":"Servicios financieros","company":"Empresa"}
+
+def clasificar(t):
+    if "shop" in t: return SHOP.get(t["shop"], "Comercio"), "negocio"
+    if t.get("amenity") in AMEN: return AMEN[t["amenity"]]
+    if t.get("tourism") in TUR: return TUR[t["tourism"]]
+    if t.get("leisure") in LEI: return LEI[t["leisure"]], "ocio"
+    if t.get("natural") == "beach": return "Playa", "ocio"
+    if "historic" in t: return "Patrimonio", "ocio"
+    if "office" in t: return OFI.get(t["office"], "Oficina"), "negocio"
+    if "craft" in t: return "Oficios y artesanía", "negocio"
+    return None
+
+def direccion(t):
+    calle = " ".join(x for x in (t.get("addr:street"), t.get("addr:housenumber")) if x)
+    resto = " ".join(x for x in (t.get("addr:postcode"), t.get("addr:city")) if x)
+    return ", ".join(x for x in (calle, resto) if x)
+
+def convertir(elementos):
+    vistos, salida = set(), []
+    for e in elementos:
+        t = e.get("tags", {}); nombre = t.get("name", "").strip()
+        cl = clasificar(t)
+        if not nombre or not cl: continue
+        lat = e.get("lat") or e.get("center", {}).get("lat"); lon = e.get("lon") or e.get("center", {}).get("lon")
+        clave = (nombre.lower(), cl[0], round(lat or 0, 3), round(lon or 0, 3))
+        if clave in vistos: continue
+        vistos.add(clave)
+        web = t.get("website") or t.get("contact:website") or ""
+        if web and not web.startswith("http"): web = "https://" + web
+        item = {"n": nombre, "c": cl[0], "t": cl[1], "a": direccion(t),
+                "p": t.get("phone") or t.get("contact:phone") or "", "w": web,
+                "h": t.get("opening_hours", ""), "lat": lat, "lon": lon}
+        salida.append(item)
+    return salida
+
+def descargar():
+    datos = urllib.parse.urlencode({"data": CONSULTA}).encode()
+    for _ in range(3):
+        for url in SERVIDORES:
+            try:
+                req = urllib.request.Request(url, data=datos, headers={"User-Agent": "chiclana-directorio/1.0"})
+                with urllib.request.urlopen(req, timeout=240) as r:
+                    return json.load(r)["elements"]
+            except Exception as err:
+                print("Fallo en", url, err, file=sys.stderr)
+        time.sleep(30)
+    sys.exit("No se pudo descargar nada de OpenStreetMap")
+
+if __name__ == "__main__":
+    osm = convertir(descargar())
+    if len(osm) < 30:   # protección: si falla la descarga, NO se borra la web
+        sys.exit(f"Solo {len(osm)} resultados: se cancela para no estropear el sitio")
+    manuales = json.loads((RAIZ / "manuales.json").read_text(encoding="utf-8"))
+    nombres = {m["n"].lower() for m in manuales}
+    todo = manuales + [o for o in osm if o["n"].lower() not in nombres]
+    todo.sort(key=lambda x: x["n"].lower())
+    (RAIZ / "data.json").write_text(json.dumps({"actualizado": datetime.date.today().isoformat(), "items": todo},
+                                               ensure_ascii=False), encoding="utf-8")
+    print(len(todo), "fichas guardadas")
