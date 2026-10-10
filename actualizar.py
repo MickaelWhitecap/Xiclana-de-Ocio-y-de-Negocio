@@ -62,6 +62,27 @@ def direccion(t):
     resto = " ".join(x for x in (t.get("addr:postcode"), t.get("addr:city")) if x)
     return ", ".join(x for x in (calle, resto) if x)
 
+COCINA = {"seafood":"mariscos y pescado","fish":"pescado","tapas":"tapas","pizza":"pizza","burger":"hamburguesas",
+ "spanish":"cocina española","regional":"cocina regional","mediterranean":"mediterránea","italian":"italiana",
+ "chinese":"china","japanese":"japonesa","sushi":"sushi","kebab":"kebab","steak_house":"carnes","grill":"parrilla",
+ "ice_cream":"helados","coffee_shop":"café","sandwich":"bocadillos","vegetarian":"vegetariana","vegan":"vegana",
+ "chicken":"pollo","andalusian":"andaluza","mexican":"mexicana","indian":"india","asian":"asiática","bakery":"panadería"}
+
+def distintivo(t):
+    """Solo datos que figuran en OpenStreetMap; nada inventado."""
+    partes = []
+    d = (t.get("description:es") or t.get("description") or "").strip()
+    if d and len(d) <= 140: partes.append(d.rstrip("."))
+    cocina = [COCINA[c.strip()] for c in t.get("cuisine", "").split(";") if c.strip() in COCINA]
+    if cocina: partes.append("Cocina: " + ", ".join(cocina))
+    if t.get("stars"): partes.append(t["stars"] + " estrellas")
+    if t.get("tourism") == "viewpoint": partes.append("Mirador con vistas")
+    for k, v in (("outdoor_seating", "terraza"), ("takeaway", "para llevar"), ("delivery", "a domicilio"),
+                 ("wheelchair", "accesible")):
+        if t.get(k) == "yes": partes.append(v)
+    if t.get("internet_access") == "wlan": partes.append("wifi")
+    return "; ".join(partes)
+
 def convertir(elementos):
     vistos, salida = set(), []
     for e in elementos:
@@ -75,7 +96,8 @@ def convertir(elementos):
         web = t.get("website") or t.get("contact:website") or ""
         if web and not web.startswith("http"): web = "https://" + web
         item = {"n": nombre, "c": cl[0], "t": cl[1], "a": direccion(t),
-                "p": t.get("phone") or t.get("contact:phone") or "", "w": web,
+                "p": t.get("phone") or t.get("contact:phone") or t.get("contact:mobile") or t.get("mobile") or "", "w": web,
+                "s": distintivo(t),
                 "h": t.get("opening_hours", ""), "lat": lat, "lon": lon}
         salida.append(item)
     return salida

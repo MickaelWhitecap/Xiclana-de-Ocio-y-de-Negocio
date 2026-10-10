@@ -40,7 +40,7 @@ input,select,textarea{font:inherit;color:var(--ink);background:var(--card);borde
 .card .top{display:flex;align-items:center;gap:.45rem}.card .ic{font-size:1.3rem;line-height:1}
 .tag{font-size:.82rem;font-weight:700;color:var(--acc)}
 .card h3{margin:0;font:700 1.12rem/1.25 var(--dsp)}
-.card p{margin:0;color:var(--mut);font-size:.93rem}
+.card p.s{color:var(--ink);font-weight:600}.card p{margin:0;color:var(--mut);font-size:.93rem}
 .card a{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--acc);text-decoration-thickness:2px;text-underline-offset:3px;font-size:.92rem}
 .card .acts{display:flex;gap:1rem;flex-wrap:wrap;margin-top:auto;padding-top:.45rem}
 button.lnk{background:none;border:0;color:#c0392b;cursor:pointer;font:inherit;font-size:.86rem;padding:0}
@@ -82,7 +82,7 @@ footer{background:var(--nav);color:#c9d8e6;font-size:.88rem;padding:1.6rem 1rem;
 <form id="f">
 <input name="n" placeholder="Nombre *" required><select name="t"><option value="negocio">Negocio</option><option value="ocio">Ocio</option></select>
 <input name="c" placeholder="Categoría (ej. Restaurante) *" required><input name="a" placeholder="Dirección">
-<input name="p" placeholder="Teléfono"><input name="w" type="url" placeholder="Web (https://…)">
+<input name="p" placeholder="Teléfono"><input name="s" placeholder="Lo mejor del sitio (plato estrella, vistas…)"><input name="w" type="url" placeholder="Web (https://…)">
 <textarea class="w" name="d" rows="2" placeholder="Descripción"></textarea>
 <div class="w"><button class="btn" type="submit">Guardar</button> <button class="btn s" type="button" id="exp">Exportar JSON</button> <button class="btn s" type="button" id="imp">Importar JSON</button></div>
 </form>
@@ -108,7 +108,7 @@ function render(){
   if(t&&x.t!==t||cat&&x.c!==cat)return;
   if(q&&![x.n,x.c,x.a,x.d].join(" ").toLowerCase().includes(q))return;
   n++;if(n>LIM)return;const c=el("div","card");const tp=el("div","top");tp.append(el("span","ic",ico(x)),el("span","tag",x.c));c.append(tp,el("h3","",x.n));
-  if(x.a)c.append(el("p","","📍 "+x.a));if(x.p)c.append(el("p","","📞 "+x.p));if(x.h)c.append(el("p","","🕒 "+x.h));if(x.d)c.append(el("p","",x.d));
+  if(x.a)c.append(el("p","","📍 "+x.a));{let p=el("p","");p.append("📞 ");if(x.p){const t=x.p.split(/[;,]/)[0].replace(/[^\d+]/g,""),a=el("a","",x.p);a.href="tel:"+(/^\d{9}$/.test(t)?"+34"+t:t);p.append(a)}else if(!/playa|parque|natur|patrimonio|mirador|plaza|atracc/i.test(x.c)){p.append("sin teléfono registrado");p.className="mut"}else p=null;if(p)c.append(p)}if(x.s)c.append(el("p","s","⭐ "+x.s));if(x.h)c.append(el("p","","🕒 "+x.h));if(x.d)c.append(el("p","",x.d));
   const a=el("div","acts"),m=el("a","","Ver en mapa");m.href=x.lat?"https://www.google.com/maps/search/?api=1&query="+x.lat+","+x.lon:map(x.n);m.target="_blank";m.rel="noopener";a.append(m);
   if(x.w&&/^https?:\/\//.test(x.w)){const w=el("a","","Web");w.href=x.w;w.target="_blank";w.rel="noopener";a.append(w)}
   if(!x.seed){const d=el("button","lnk","Eliminar");d.onclick=()=>{mine.splice(i-SEED.length,1);save();render()};a.append(d)}
@@ -120,9 +120,9 @@ const MN=CATS,MO=["Restaurantes","Bares y tapas","Cafeterías","Heladerías","Pl
 function mapas(){const m=$("#maps");m.textContent="";$("#mt").textContent=modo==="ocio"?"Más ocio, en el mapa":"Todos los negocios, en el mapa";(modo==="ocio"?MO:MN).forEach(c=>{const a=el("a","chip",c);a.href=map(c);a.target="_blank";a.rel="noopener";a.style.textDecoration="none";m.append(a)})}
 function elegir(m){modo=m;document.body.dataset.m=m;$("#elige").classList.add("sel");cat="";q_.value="";if(typeof LIM!=="undefined")LIM=120;document.querySelectorAll(".op").forEach(b=>b.classList.toggle("on",b.dataset.m===m));$("#main").hidden=false;$("#hint").hidden=true;document.querySelector("[name=t]").value=m;mapas();render();$("#main").scrollIntoView({behavior:"smooth"})}
 const q_=$("#q");document.querySelectorAll(".op").forEach(b=>b.onclick=()=>elegir(b.dataset.m));
-$("#f").onsubmit=e=>{e.preventDefault();const d=new FormData(e.target);mine.push({n:d.get("n"),t:d.get("t"),c:d.get("c"),a:d.get("a"),p:d.get("p"),w:d.get("w"),d:d.get("d")});save();e.target.reset();render()};
+$("#f").onsubmit=e=>{e.preventDefault();const d=new FormData(e.target);mine.push({n:d.get("n"),t:d.get("t"),c:d.get("c"),a:d.get("a"),p:d.get("p"),w:d.get("w"),s:d.get("s"),d:d.get("d")});save();e.target.reset();render()};
 $("#exp").onclick=()=>{const s=JSON.stringify(mine,null,1);navigator.clipboard?.writeText(s).then(()=>alert("JSON copiado al portapapeles"),()=>prompt("Copia el JSON:",s))||prompt("Copia el JSON:",s)};
-$("#imp").onclick=()=>{const s=prompt("Pega aquí el JSON exportado:");if(!s)return;try{const a=JSON.parse(s);if(Array.isArray(a)){mine=mine.concat(a.filter(x=>x&&x.n&&x.c&&(x.t==="ocio"||x.t==="negocio")).map(x=>({n:String(x.n),t:x.t,c:String(x.c),a:x.a?String(x.a):"",p:x.p?String(x.p):"",w:x.w?String(x.w):"",d:x.d?String(x.d):""})));save();render()}}catch(e){alert("JSON no válido")}};
+$("#imp").onclick=()=>{const s=prompt("Pega aquí el JSON exportado:");if(!s)return;try{const a=JSON.parse(s);if(Array.isArray(a)){mine=mine.concat(a.filter(x=>x&&x.n&&x.c&&(x.t==="ocio"||x.t==="negocio")).map(x=>({n:String(x.n),t:x.t,c:String(x.c),a:x.a?String(x.a):"",p:x.p?String(x.p):"",w:x.w?String(x.w):"",s:x.s?String(x.s):"",d:x.d?String(x.d):""})));save();render()}}catch(e){alert("JSON no válido")}};
 fetch("data.json").then(r=>r.json()).then(j=>{SEED=j.items.map(x=>({...x,seed:1}));$("#fecha").textContent="Última actualización automática: "+j.actualizado+" · "+j.items.length+" fichas";render()}).catch(()=>render());
 const im=new Image();im.onload=()=>{document.querySelector(".hero").classList.add("foto");fetch("fondo.txt").then(r=>r.ok?r.text():"").then(t=>{$("#cr").textContent=t.trim()}).catch(()=>{})};im.src="fondo.jpg";
 </script></body></html>
