@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Descarga de OpenStreetMap los comercios y lugares de Chiclana y crea data.json."""
-import json, sys, time, datetime, pathlib, urllib.parse, urllib.request
+import json, sys, time, datetime, pathlib, re, unicodedata, urllib.parse, urllib.request
 
 RAIZ = pathlib.Path(__file__).parent
 SERVIDORES = ["https://overpass-api.de/api/interpreter",
@@ -98,7 +98,7 @@ def convertir(elementos):
         item = {"n": nombre, "c": cl[0], "t": cl[1], "a": direccion(t),
                 "p": t.get("phone") or t.get("contact:phone") or t.get("contact:mobile") or t.get("mobile") or "", "w": web,
                 "s": distintivo(t),
-                "h": t.get("opening_hours", ""), "lat": lat, "lon": lon}
+                "h": t.get("opening_hours", ""), "e": t.get("email") or t.get("contact:email") or "", "lat": lat, "lon": lon, "f": "OpenStreetMap"}
         salida.append(item)
     return salida
 
@@ -115,13 +115,50 @@ def descargar():
         time.sleep(30)
     sys.exit("No se pudo descargar nada de OpenStreetMap")
 
+PARO = {"de", "del", "la", "las", "el", "los", "y", "en", "hotel", "chiclana"}
+CAMPOS = ("p", "e", "w", "h", "d", "s", "m", "a", "lat", "lon")
+
+def _tokens(texto):
+    t = unicodedata.normalize("NFD", texto.lower())
+    t = "".join(c for c in t if unicodedata.category(c) != "Mn")
+    return frozenset(w for w in re.findall(r"[a-z0-9]+", t) if w not in PARO)
+
+def _mismo(a, b):
+    ka, kb = a["_k"], b["_k"]
+    if not ka or not kb or len(ka & kb) / len(ka | kb) < 0.7: return False
+    if a.get("t") != b.get("t"): return False
+    if a.get("lat") and b.get("lat"):
+        return abs(a["lat"] - b["lat"]) < 0.003 and abs(a["lon"] - b["lon"]) < 0.004
+    da, db = _tokens(a.get("a", "")), _tokens(b.get("a", ""))
+    if da and db and len(da & db) / min(len(da), len(db)) < 0.5: return False
+    return True
+
+def fusionar(*listas):
+    """Une fuentes por orden de prioridad: la primera manda y las siguientes solo rellenan huecos."""
+    todo = []
+    for lista in listas:
+        for it in lista:
+            it = dict(it); it["_k"] = _tokens(it["n"])
+            cand = [x for x in todo if _mismo(x, it)]
+            if len(cand) != 1:   # ninguna o varias candidatas: se deja como ficha aparte
+                todo.append(it); continue
+            otro = cand[0]
+            nuevo = False
+            for c in CAMPOS:
+                if not otro.get(c) and it.get(c): otro[c] = it[c]; nuevo = True
+            if nuevo and it.get("f") and it["f"] not in otro.get("f", ""):
+                otro["f"] = (otro.get("f", "") + " + " + it["f"]).strip(" +")
+    for x in todo: x.pop("_k")
+    return todo
+
 if __name__ == "__main__":
     osm = convertir(descargar())
     if len(osm) < 30:   # protección: si falla la descarga, NO se borra la web
         sys.exit(f"Solo {len(osm)} resultados: se cancela para no estropear el sitio")
     manuales = json.loads((RAIZ / "manuales.json").read_text(encoding="utf-8"))
-    nombres = {m["n"].lower() for m in manuales}
-    todo = manuales + [o for o in osm if o["n"].lower() not in nombres]
+    ofi = RAIZ / "oficiales.json"
+    oficiales = json.loads(ofi.read_text(encoding="utf-8")) if ofi.exists() else []
+    todo = fusionar(manuales, oficiales, osm)
     todo.sort(key=lambda x: x["n"].lower())
     (RAIZ / "data.json").write_text(json.dumps({"actualizado": datetime.date.today().isoformat(), "items": todo},
                                                ensure_ascii=False), encoding="utf-8")
