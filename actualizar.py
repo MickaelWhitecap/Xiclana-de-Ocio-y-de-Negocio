@@ -28,8 +28,8 @@ SHOP = {"supermarket":"Supermercado","convenience":"Tienda de barrio","bakery":"
  "gift":"Regalos","toys":"Juguetes","car":"Concesionario","car_parts":"Recambios","tyres":"Neumáticos",
  "deli":"Delicatessen","variety_store":"Bazar","stationery":"Papelería","travel_agency":"Agencia de viajes",
  "bag":"Bolsos","fabric":"Telas","bed":"Colchones","interior_decoration":"Decoración","garden_centre":"Jardinería"}
-AMEN = {"restaurant":("Restaurante","negocio"),"bar":("Bar","ocio"),"pub":("Bar","ocio"),"cafe":("Cafetería","negocio"),
- "fast_food":("Comida rápida","negocio"),"ice_cream":("Heladería","negocio"),"pharmacy":("Farmacia","negocio"),
+AMEN = {"restaurant":("Restaurante","ocio"),"bar":("Bar","ocio"),"pub":("Bar","ocio"),"cafe":("Cafetería","ocio"),
+ "fast_food":("Comida rápida","ocio"),"ice_cream":("Heladería","ocio"),"pharmacy":("Farmacia","negocio"),
  "clinic":("Clínica","negocio"),"dentist":("Dentista","negocio"),"doctors":("Consulta médica","negocio"),
  "veterinary":("Veterinario","negocio"),"bank":("Banco","negocio"),"cinema":("Cine","ocio"),"theatre":("Teatro","ocio"),
  "nightclub":("Discoteca","ocio"),"marketplace":("Mercado","negocio"),"fuel":("Gasolinera","negocio"),
