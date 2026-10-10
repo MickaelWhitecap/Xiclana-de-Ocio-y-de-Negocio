@@ -69,7 +69,7 @@ def convertir(elementos):
         cl = clasificar(t)
         if not nombre or not cl: continue
         lat = e.get("lat") or e.get("center", {}).get("lat"); lon = e.get("lon") or e.get("center", {}).get("lon")
-        clave = (nombre.lower(), cl[0], round(lat or 0, 3), round(lon or 0, 3))
+        clave = (nombre.lower(), cl[0], direccion(t) or (round(lat or 0, 2), round(lon or 0, 2)))
         if clave in vistos: continue
         vistos.add(clave)
         web = t.get("website") or t.get("contact:website") or ""
