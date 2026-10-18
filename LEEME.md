@@ -71,3 +71,36 @@ Truco: cualquier negocio puede darse de alta gratis en openstreetmap.org, y apar
 - Los horarios y teléfonos son tan buenos como los que haya introducido la gente.
 - GitHub **desactiva las tareas programadas si el repositorio pasa 60 días sin ninguna actividad**. Te avisarán por correo; se reactiva con un clic en la pestaña Actions.
 - Si la descarga falla un lunes, el programa se detiene a propósito y la web conserva los datos anteriores (nunca se queda vacía).
+
+## 7. Poner una foto de fondo en la cabecera (opcional)
+
+1. Busca una foto que tengas derecho a usar: la tuya, una con permiso escrito, o una con licencia libre (por ejemplo en commons.wikimedia.org; cada foto indica su autor y su licencia).
+2. Guárdala en tu ordenador con el nombre exacto `fondo.jpg` (en minúsculas). Mejor que pese menos de 1 MB.
+3. En tu repositorio pulsa **Add file → Upload files**, arrastra `fondo.jpg` y pulsa **Commit changes**.
+4. Si la licencia pide citar al autor (casi todas las libres lo piden), crea otro archivo: **Add file → Create new file**, nómbralo `fondo.txt` y escribe una línea, por ejemplo: `Foto: Nombre del autor, licencia CC BY-SA 4.0`. Pulsa **Commit changes**.
+5. Espera 1 o 2 minutos a que termine la pestaña **Actions** y recarga la web con Ctrl+F5.
+
+Si no existe `fondo.jpg`, la página muestra el mosaico de salinas.
+
+## 8. Espacios destacados de pago (laterales)
+
+La web tiene dos espacios fijos, uno a cada lado, que se quedan visibles mientras se baja por la página. En pantallas anchas (de 1500 píxeles en adelante) salen en los márgenes. En pantallas más estrechas, como móviles y portátiles, esos negocios salen en una franja horizontal bajo los botones Ocio y Negocio, para que no pierdan visibilidad.
+
+**Cómo añadir un negocio que ha pagado un mes**
+1. En tu repositorio abre `destacados.json` y pulsa el lápiz ✏️.
+2. Dentro de los corchetes de `"espacios": []` pega un bloque como este (con una coma entre bloques si hay varios):
+```
+{"n":"Nombre del negocio","c":"Restaurante","lema":"Una frase corta","p":"956 000 000","w":"https://www.ejemplo.es","lado":"izquierda","desde":"2026-11-01","hasta":"2026-11-30"}
+```
+3. `lado` es `"izquierda"` o `"derecha"`. Las fechas van como año-mes-día.
+4. **Pon siempre la fecha `hasta`.** Si falta, el anuncio no caduca nunca.
+5. Pulsa **Commit changes**. En 1 o 2 minutos aparece. Cuando pasa la fecha `hasta`, desaparece solo.
+
+**Cartel "Tu negocio aquí"**
+Si escribes un correo o un enlace de WhatsApp en `"contacto"`, los espacios libres muestran un cartel con un enlace para reservar. Si lo dejas vacío, los espacios libres no se ven.
+
+**Notas**
+- Cada tarjeta lleva la etiqueta "Destacado · Publicidad", porque la publicidad tiene que poder identificarse como tal. Los enlaces llevan la marca `sponsored`, la recomendada para enlaces de pago.
+- Cada lado muestra como máximo dos negocios a la vez.
+- La fecha se comprueba con el reloj de quien visita la web.
+- El cobro, la factura y el IVA los gestionas aparte. Consúltalo con tu gestor.

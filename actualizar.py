@@ -162,6 +162,8 @@ if __name__ == "__main__":
     turismo = json.loads(tur.read_text(encoding="utf-8")) if tur.exists() else []
     todo = fusionar(manuales, oficiales, turismo, osm)
     todo.sort(key=lambda x: x["n"].lower())
-    (RAIZ / "data.json").write_text(json.dumps({"actualizado": datetime.date.today().isoformat(), "items": todo},
-                                               ensure_ascii=False), encoding="utf-8")
+    dst = RAIZ / "destacados.json"
+    destacados = json.loads(dst.read_text(encoding="utf-8")) if dst.exists() else {}
+    (RAIZ / "data.json").write_text(json.dumps({"actualizado": datetime.date.today().isoformat(), "items": todo,
+                                                "destacados": destacados}, ensure_ascii=False), encoding="utf-8")
     print(len(todo), "fichas guardadas")
