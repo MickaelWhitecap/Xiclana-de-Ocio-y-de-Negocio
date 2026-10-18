@@ -158,7 +158,9 @@ if __name__ == "__main__":
     manuales = json.loads((RAIZ / "manuales.json").read_text(encoding="utf-8"))
     ofi = RAIZ / "oficiales.json"
     oficiales = json.loads(ofi.read_text(encoding="utf-8")) if ofi.exists() else []
-    todo = fusionar(manuales, oficiales, osm)
+    tur = RAIZ / "turismo.json"
+    turismo = json.loads(tur.read_text(encoding="utf-8")) if tur.exists() else []
+    todo = fusionar(manuales, oficiales, turismo, osm)
     todo.sort(key=lambda x: x["n"].lower())
     (RAIZ / "data.json").write_text(json.dumps({"actualizado": datetime.date.today().isoformat(), "items": todo},
                                                ensure_ascii=False), encoding="utf-8")
