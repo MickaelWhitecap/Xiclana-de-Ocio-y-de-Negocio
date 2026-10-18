@@ -84,7 +84,7 @@ Si no existe `fondo.jpg`, la página muestra el mosaico de salinas.
 
 ## 8. Espacios destacados de pago (laterales)
 
-La web tiene dos espacios fijos, uno a cada lado, que se quedan visibles mientras se baja por la página. En pantallas anchas (de 1500 píxeles en adelante) salen en los márgenes. En pantallas más estrechas, como móviles y portátiles, esos negocios salen en una franja horizontal bajo los botones Ocio y Negocio, para que no pierdan visibilidad.
+La web tiene dos espacios fijos, uno a cada lado, que se quedan visibles mientras se baja por la página. En pantallas anchas (de unos 1200 píxeles de ancho en adelante) salen en los márgenes. En pantallas más estrechas, como móviles y portátiles, esos negocios salen en una franja horizontal bajo los botones Ocio y Negocio, para que no pierdan visibilidad.
 
 **Cómo añadir un negocio que ha pagado un mes**
 1. En tu repositorio abre `destacados.json` y pulsa el lápiz ✏️.
@@ -97,7 +97,7 @@ La web tiene dos espacios fijos, uno a cada lado, que se quedan visibles mientra
 5. Pulsa **Commit changes**. En 1 o 2 minutos aparece. Cuando pasa la fecha `hasta`, desaparece solo.
 
 **Cartel "Tu negocio aquí"**
-Si escribes un correo o un enlace de WhatsApp en `"contacto"`, los espacios libres muestran un cartel con un enlace para reservar. Si lo dejas vacío, los espacios libres no se ven.
+Si escribes un correo o un enlace de WhatsApp en `"contacto"`, los espacios libres muestran un cartel con un enlace para reservar. Si lo dejas vacío, los espacios libres se ven igualmente con el cartel, pero sin enlace para reservar.
 
 **Notas**
 - Cada tarjeta lleva la etiqueta "Destacado · Publicidad", porque la publicidad tiene que poder identificarse como tal. Los enlaces llevan la marca `sponsored`, la recomendada para enlaces de pago.

@@ -1,5 +1,5 @@
 {
- "_ayuda": "Cada negocio que paga un mes se añade como un bloque dentro de 'espacios'. Fuera de las fechas desde/hasta deja de verse solo. 'lado' puede ser izquierda o derecha. 'contacto' (correo, o enlace de WhatsApp) activa el cartel 'Tu negocio aquí' en los espacios libres.",
+ "_ayuda": "Cada negocio que paga un mes se añade como un bloque dentro de 'espacios'. Fuera de las fechas desde/hasta deja de verse solo. 'lado' puede ser izquierda o derecha. 'contacto' (correo, o enlace de WhatsApp) añade el enlace 'Reservar este espacio' al cartel que se ve en los espacios libres.",
  "_ejemplo": {
   "n": "Nombre del negocio",
   "c": "Restaurante",
